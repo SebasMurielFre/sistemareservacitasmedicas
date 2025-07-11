@@ -18,10 +18,10 @@
                 $horaInicio = strtotime('00:00:00');
                 $horaFin = strtotime('23:00:00');
                 while ($horaInicio <= $horaFin) {
-                    $horaActual = date('H:i:s', $horaInicio);
-                    $horaSiguiente = ($horaActual == '23:00:00') 
-                        ? '24:00:00' 
-                        : date('H:i:s', strtotime('+1 hour', $horaInicio));
+                    $horaActual = date('H:i', $horaInicio);
+                    $horaSiguiente = ($horaActual == '23:00')
+                        ? '24:00' 
+                        : date('H:i', strtotime('+1 hour', $horaInicio));
                     $horas[] = $horaActual . ' - ' . $horaSiguiente;
                     $horaInicio = strtotime('+1 hour', $horaInicio);
                 }

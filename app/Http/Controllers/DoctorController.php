@@ -65,6 +65,8 @@ class DoctorController extends Controller
         $doctor->direccion = $request->direccion;
         $doctor->save();
 
+        $usuario->assignRole('doctor');
+
         return redirect()->route('admin.doctores.index')
             ->with('mensaje','Se registró al doctor correctamente')
             ->with('icons','success');

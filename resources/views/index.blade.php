@@ -5,13 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIS Medical - Centro Médico</title>
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{{url('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
+    <link rel="stylesheet" href="{{url('plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
+    <link rel="stylesheet" href="{{url('plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -134,7 +143,7 @@
                     <h1 class="display-4 fw-bold mb-4">Bienvenido a SIS Medical</h1>
                     <p class="lead mb-4">Tu salud es nuestra prioridad. Ofrecemos atención médica de calidad con profesionales especializados y tecnología de vanguardia.</p>
                     <div class="d-flex gap-3">
-                        <a href="#agendar" class="btn btn-light btn-lg">
+                        <a href="{{url('/admin')}}" class="btn btn-light btn-lg">
                             <i class="fas fa-calendar-plus me-2"></i>Agendar Cita
                         </a>
                         <a href="#servicios" class="btn btn-outline-light btn-lg">
@@ -282,43 +291,44 @@
         </div>
     </section>
 
-    <!-- Agendar Cita -->
-    <section id="agendar" class="py-5">
+    <!-- Horario -->
+    <section id="horario" class="py-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
-                    <h2 class="section-title">Agendar Cita</h2>
-                    <p class="lead mb-5">Programa tu consulta médica de forma rápida y sencilla</p>
+                    <h2 class="section-title">Horario de Atención</h2>
                 </div>
             </div>
-            
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <!-- Mensajes de éxito o error -->
-                    @if(session('success'))
-                        <div class="alert alert-success alert-custom">
-                            <i class="fas fa-check-circle me-2"></i>
-                            {{ session('success') }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-inline float-right">
+                                        <div class="input-group">
+                                            <select name="doctor_id" id="doctor_id" class="form-control">
+                                                <option value="">Seleccione un doctor</option>
+                                                @foreach($horarios->pluck('doctor')->unique() as $doctor)
+                                                    <option value="{{ $doctor->id }}" {{ request('doctor_id') == $doctor->id ? 'selected' : '' }}>
+                                                        {{ $doctor->nombres }} {{ $doctor->apellidos }} - {{ $doctor->especialidad }} 
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <div class="input-group-append">
+                                                <a href="#" class="btn btn-secondary" id="limpiar-filtro" style="display:none; margin-left: 15px;">Limpiar filtro</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    @endif
-
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-custom">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            {{ session('error') }}
+                        <div class="card-body">
+                            <div id="tabla-horario-doctor-container">
+                                @include('tabla_horario_doctor', ['horarios' => $horarios, 'doctor_id' => request('doctor_id')])
+                            </div>
                         </div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="alert alert-danger alert-custom">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -435,27 +445,82 @@
         </div>
     </footer>
 
+    <!-- jQuery -->
+    <script src="{{url('plugins/jquery/jquery.min.js')}}"></script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Smooth Scrolling -->
-    <script>
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
 
-        // Set minimum date for appointment booking
-        document.addEventListener('DOMContentLoaded', function() {
+    <!-- DataTables y extensiones -->
+    <script src="{{url('plugins/datatables/jquery.dataTables.min.js')}}"></script>
+    <script src="{{url('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Función para inicializar/reinicializar DataTables
+            function initializeDataTable() {
+                if ($.fn.DataTable.isDataTable('#example2')) {
+                    $('#example2').DataTable().destroy();
+                }
+                
+                var table = $("#example2").DataTable({
+                    "pageLength": 24,
+                    "dom": 'rtip',
+                    "language": {
+                        "emptyTable": "Seleccione un doctor para ver su horario"
+                    },
+                    "responsive": true,
+                    "autoWidth": false,
+                    "searching": false,
+                    "lengthChange": false,
+                    "info": false,
+                    "paging": false,
+                });
+            }
+
+            // Función para cargar la tabla de horarios
+            function cargarTablaHorarioDoctor(doctorId) {
+                $.ajax({
+                    url: '{{ route('tabla_horario_doctor') }}',
+                    type: 'GET',
+                    data: { doctor_id: doctorId },
+                    success: function(data) {
+                        $('#tabla-horario-doctor-container').html(data);
+                        initializeDataTable(); // Inicializar DataTables después de cargar
+                    },
+                    error: function(xhr) {
+                        console.error('Error al cargar horarios:', xhr.responseText);
+                    }
+                });
+            }
+
+            // Eventos
+            $('#doctor_id').on('change', function() {
+                var doctorId = $(this).val();
+                cargarTablaHorarioDoctor(doctorId);
+                $('#limpiar-filtro').toggle(!!doctorId);
+            });
+
+            $('#limpiar-filtro').on('click', function(e) {
+                e.preventDefault();
+                $('#doctor_id').val('').trigger('change');
+            });
+
+            // Inicialización inicial
+            if($('#doctor_id').val()) {
+                $('#limpiar-filtro').show();
+                cargarTablaHorarioDoctor($('#doctor_id').val());
+            }
+
+            // Smooth scrolling con jQuery para consistencia
+            $('a[href^="#"]').on('click', function(e) {
+                e.preventDefault();
+                $('html, body').animate({
+                    scrollTop: $($(this).attr('href')).offset().top
+                }, 500);
+            });
+
+            // Set minimum date for appointment booking
             const fechaInput = document.getElementById('fecha');
             if (fechaInput) {
                 const today = new Date();

@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [App\Http\Controllers\WebController::class, 'index'])->name('index');
+Route::get('/tabla-horario-doctor', [App\Http\Controllers\WebController::class, 'horarioPorDoctor'])->name('tabla_horario_doctor');
 
 Auth::routes();
 

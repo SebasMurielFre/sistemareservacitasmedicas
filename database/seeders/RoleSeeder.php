@@ -52,20 +52,20 @@ class RoleSeeder extends Seeder
         Permission::create(['name'=>'admin.pacientes.destroy'])->syncRoles([$admin, $secretaria, $doctor]);
 
         // Permisos para admin-consultorios
-        Permission::create(['name'=>'admin.consultorios.index'])->syncRoles([$admin]);
+        Permission::create(['name'=>'admin.consultorios.index'])->syncRoles([$admin, $secretaria, $doctor]);
         Permission::create(['name'=>'admin.consultorios.create'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.consultorios.store'])->syncRoles([$admin]);
-        Permission::create(['name'=>'admin.consultorios.show'])->syncRoles([$admin]);
+        Permission::create(['name'=>'admin.consultorios.show'])->syncRoles([$admin, $secretaria, $doctor]);
         Permission::create(['name'=>'admin.consultorios.edit'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.consultorios.update'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.consultorios.confirmDelete'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.consultorios.destroy'])->syncRoles([$admin]);
 
         // Permisos para admin-doctores
-        Permission::create(['name'=>'admin.doctores.index'])->syncRoles([$admin]);
+        Permission::create(['name'=>'admin.doctores.index'])->syncRoles([$admin, $secretaria, $doctor]);
         Permission::create(['name'=>'admin.doctores.create'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.doctores.store'])->syncRoles([$admin]);
-        Permission::create(['name'=>'admin.doctores.show'])->syncRoles([$admin]);
+        Permission::create(['name'=>'admin.doctores.show'])->syncRoles([$admin, $secretaria, $doctor]);
         Permission::create(['name'=>'admin.doctores.edit'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.doctores.update'])->syncRoles([$admin]);
         Permission::create(['name'=>'admin.doctores.confirmDelete'])->syncRoles([$admin]);

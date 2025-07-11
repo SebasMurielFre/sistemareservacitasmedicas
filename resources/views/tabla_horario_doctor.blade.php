@@ -18,7 +18,7 @@
                 $horaInicio = strtotime('00:00:00');
                 $horaFin = strtotime('23:00:00');
                 while ($horaInicio <= $horaFin) {
-                    $horaActual = date('H:i', $horaInicio);
+                    $horaActual = date('H:i', $horaInicio); 
                     $horaSiguiente = ($horaActual == '23:00')
                         ? '24:00' 
                         : date('H:i', strtotime('+1 hour', $horaInicio));
@@ -53,7 +53,7 @@
                                     $horaFinIntervalo = strtotime($hora_fin);
                                     if($horaInicioIntervalo >= $horaInicioHorario && $horaFinIntervalo <= $horaFinHorario){
                                         $estado = '';
-                                        $nombre_consultorio = $horario->consultorio->nombre.' - '.$horario->consultorio->especialidad.', '.$horario->consultorio->ubicacion;
+                                        $nombre_consultorio = $horario->consultorio->nombre.' - '.$horario->consultorio->especialidad;
                                         break;
                                     }else {
                                         $estado = 'No atiende';
@@ -73,48 +73,3 @@
         @endif
     </tbody>
 </table>
-<script>
-    $(function () {
-        var table = $("#example2").DataTable({
-            "pageLength": 24,
-            "dom": 'Bfrtip',
-            "language": {
-                "emptyTable": "Seleccione un doctor para ver su horario",
-                "buttons": {
-                    "copyTitle": "Copiado al portapapeles",
-                    "copySuccess": {
-                        "_": "Horario Copiado",
-                    },
-                    "colvisRestore": "Restaurar visibilidad",
-                },
-            },
-            "responsive": true,
-            "autoWidth": false,
-            "searching": false,
-            "lengthChange": false,
-            "info": false,
-            "paging": false,
-            buttons: [
-                {
-                    extend: 'collection',
-                    text: 'Reportes',
-                    orientation: 'landscape',
-                    buttons: [
-                        { extend: 'copy', text: 'Copiar' },
-                        { extend: 'pdf' },
-                        { extend: 'csv' },
-                        { extend: 'excel' },
-                        { extend: 'print', text: 'Imprimir' }
-                    ]
-                },
-                {
-                    extend: 'colvis',
-                    text: 'Visor de columnas',
-                    align: 'button-right',
-                    postfixButtons: ['colvisRestore'],
-                }
-            ]
-        });
-        table.buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
-    });
-</script>
