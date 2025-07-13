@@ -32,6 +32,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="{{url('plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
   <link rel="stylesheet" href="{{url('plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
 
+  <!-- FullCalendar -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.18/index.global.min.js'></script>
+  <script src="{{url('fullcalendar/es.global.js')}}"></script>
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">

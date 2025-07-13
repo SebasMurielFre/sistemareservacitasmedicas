@@ -4,14 +4,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\WebController::class, 'index'])->name('index');
 Route::get('/tabla-horario-doctor', [App\Http\Controllers\WebController::class, 'horarioPorDoctor'])->name('tabla_horario_doctor');
+Route::post('/admin/eventos/create', [App\Http\Controllers\EventoController::class, 'store'])->name('admin.eventos.create');
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index');
 
 //rutas para el administrador
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')
         -> middleware('auth');
+Route::get('/tabla-horario-doctor-index', [App\Http\Controllers\AdminController::class, 'horarioPorDoctor'])->name('tabla_horario_doctor_index');
 
 //rutas para el admin-usuarios
 Route::get('/admin/usuarios', [App\Http\Controllers\UsuarioController::class, 'index'])->name('admin.usuarios.index')

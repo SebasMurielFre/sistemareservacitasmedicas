@@ -32,4 +32,8 @@ class Doctor extends Model
     public function horarios(){
         return $this->hasMany(Horario::class);
     }
+
+    public function eventos(){
+        return $this->hasMany(Evento::class);
+    }
 }
