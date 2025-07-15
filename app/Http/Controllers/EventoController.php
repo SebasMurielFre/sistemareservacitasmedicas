@@ -106,7 +106,7 @@ class EventoController extends Controller
         $fechaHoraFin = $fechaHoraInicio->copy()->addHour();
             
         $evento = new Evento();
-        $evento->title = $fechaHoraInicio->format('H:i') . " - " . $fechaHoraFin->format('H:i') . " " . $doctor->especialidad;
+        $evento->title = $fechaHoraInicio->format('H:i') . " - " . $fechaHoraFin->format('H:i') . ", " . $doctor->especialidad;
         $evento->start =  $fechaHoraInicio->format('Y-m-d H:i:s');
         $evento->end = $fechaHoraFin->format('Y-m-d H:i:s');
         $evento->user_id = Auth::user()->id;

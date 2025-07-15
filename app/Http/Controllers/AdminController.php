@@ -67,4 +67,28 @@ class AdminController extends Controller
             'doctor_id' => $doctor_id
         ]);
     }
+    
+    public function verReservas($id){
+        $eventos = Evento::where('user_id', $id)
+            ->get();
+        
+        $user = User::find($id);
+
+        $eventosConHorario = $eventos->map(function ($evento) {
+            $diaEspanol = ucfirst(\Carbon\Carbon::parse($evento->start)->isoFormat('dddd'));
+            $horaCita = \Carbon\Carbon::parse($evento->start)->format('H:i');
+            
+            $horario = Horario::with('consultorio')
+                ->where('doctor_id', $evento->doctor_id)
+                ->where('dia', $diaEspanol)
+                ->where('hora_inicio', '<=', $horaCita)
+                ->where('hora_fin', '>', $horaCita)
+                ->first();
+            
+            $evento->horario = $horario;
+            return $evento;
+        });
+
+        return view('admin.ver_citas', compact('eventosConHorario', 'user'));
+    }
 }

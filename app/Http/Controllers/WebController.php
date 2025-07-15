@@ -65,7 +65,7 @@ class WebController extends Controller
                     $doctor = Doctor::find($evento->doctor_id);
 
                     return [
-                        'title' => $evento->title. ' - ' .$doctor->nombres. ' ' . $doctor->apellidos,
+                        'title' => trim(explode(',', $evento->title)[0]). ' - ' .$doctor->nombres. ' ' . $doctor->apellidos,
                         'start' => \Carbon\Carbon::parse($evento->start)->format('Y-m-d'),
                         'end' => \Carbon\Carbon::parse($evento->end)->format('Y-m-d'),
                         'color' => $color
