@@ -132,22 +132,20 @@
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div class="col-md-8">
                         <!-- Button trigger modal -->
-                        <button type="button" class="btn" style="background-color: #8111cb98; color: white; border: none;" data-toggle="modal" data-target="#exampleModal">
-                            Agendar Cita
-                        </button>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Agendar Cita</button>
 
                         <!-- Modal -->
-                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" style="color:black"><b>Agendar Cita</b></h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <form id="form-agendar-cita">
-                                        @csrf
+                        <form action="{{url('/admin/eventos/create')}}" method="post">
+                            @csrf
+                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" style="color:black" id="exampleModalLabel"><b>Agendar Cita</b></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
                                         <div class="modal-body">
                                             <div class="row">
                                                 <div class="col-md-12">
@@ -161,59 +159,164 @@
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        <small class="error-message text-danger" data-field="doctor_id"></small>
+                                                        @error('doctor_id')
+                                                            <small style="color:red">{{$message}}</small>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label style="color:black">Fecha de Cita</label><b style="color:black">*</b>
-                                                        <input type="date" 
-                                                            name="fecha_cita" 
-                                                            id="fecha_cita_modal"
-                                                            class="form-control" 
-                                                            required>
-                                                        <small class="error-message text-danger" data-field="fecha_cita"></small>
+                                                        <input type="date" name="fecha_cita" id="fecha_cita_modal" value="<?php echo date('Y-m-d');?>" min="<?php echo date('Y-m-d');?>" class="form-control" required>
+                                                        <small id="fecha_error" style="color:red; display:none;"></small>
+                                                        @error('fecha_cita')
+                                                            <small style="color:red">{{$message}}</small>
+                                                        @enderror
+                                                        @if(($message = Session::get('fecha_cita')))
+                                                            <script>
+                                                                document.addEventListener('DOMContentLoaded',function (){
+                                                                    $('#exampleModal').modal('show');
+                                                                });
+                                                            </script>
+                                                            <small style="color:red">{{$message}}</small>
+                                                        @endif
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded',function (){
+                                                                const fechaReservaInput = document.getElementById('fecha_cita_modal');
+                                                                const fechaError = document.getElementById('fecha_error');
+
+                                                                //Escuchar el evento de cambio en el campo de fecha reserva
+                                                                fechaReservaInput.addEventListener('change', function() {
+                                                                    let selectedDate = this.value; // Obtener la Fecha seleccionada
+
+                                                                    //Obtener la fecha actual en formato ISO (yyyy-mm-dd)
+                                                                    let today = new Date().toISOString().slice(0, 10);
+
+                                                                    //Verificar si la fecha seleccionada es anterior a la fecha actual
+                                                                    if (selectedDate < today) {
+                                                                        // Si es así, establecer la fecha seleccionada en null
+                                                                        this.value = null;
+                                                                        fechaError.textContent = 'No se puede agendar en una fecha pasada.';
+                                                                        fechaError.style.display = 'block';
+                                                                    } else {
+                                                                        fechaError.style.display = 'none';
+                                                                    }
+                                                                });
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
                                                         <label style="color:black">Hora de Cita</label><b style="color:black">*</b>
-                                                        <input type="time" 
-                                                            name="hora_cita" 
-                                                            id="hora_cita_modal"
-                                                            class="form-control" 
-                                                            required>
-                                                        <small class="error-message text-danger" data-field="hora_cita"></small>
+                                                        <input type="time" name="hora_cita" id="hora_cita_modal" class="form-control" required>
+                                                        <small id="hora_error" style="color:red; display:none;"></small>
+                                                        @error('hora_cita')
+                                                            <small style="color:red">{{$message}}</small>
+                                                        @enderror
+                                                        @if(($message = Session::get('hora_cita')))
+                                                            <script>
+                                                                document.addEventListener('DOMContentLoaded',function (){
+                                                                    $('#exampleModal').modal('show');
+                                                                });
+                                                            </script>
+                                                            <small style="color:red">{{$message}}</small>
+                                                        @endif
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function (){
+                                                                const horaReservaInput = document.getElementById('hora_cita_modal');
+                                                                const horaError = document.getElementById('hora_error');
+                                                                
+                                                                //Escuchar el evento de cambio en el campo de hora reserva
+                                                                horaReservaInput.addEventListener('change',function (){
+                                                                    let seletedTime = this.value;
+                                                                    
+                                                                    if(seletedTime){
+                                                                        seletedTime = seletedTime.split(':');
+                                                                        seletedTime = seletedTime[0]+ ':00';
+                                                                        this.value = seletedTime;
+                                                                    }
+                                                                    
+                                                                    if(seletedTime<'00:00' || seletedTime>'23:00'){
+                                                                        this.value = null;
+                                                                        horaError.textContent = 'No se puede agendar a la hora seleccionada.';
+                                                                        horaError.style.display = 'block';
+                                                                    } else {
+                                                                        horaError.style.display = 'none';
+                                                                    };
+                                                                });
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-primary" id="btn-agendar">
-                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                                Agendar
-                                            </button>
+                                            <button type="submit" class="btn btn-primary" id="btn-agendar">Agendar</button>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="col-md-4">
                         <div class="d-flex align-items-center">
                             <div class="input-group">
                                 <select name="doctor_id2" id="doctor_id2" class="form-control">
                                     <option value="">Seleccione un doctor</option>
+                                    <option value="0">Todos</option>
                                     @foreach($doctores as $doctor)
-                                        <option value="{{ $doctor->id }}" {{ $doctor_id == $doctor->id ? 'selected' : '' }}>
+                                        <option value="{{ $doctor->id}}" {{ $doctor_id == $doctor->id ? 'selected' : '' }}>
                                             {{ $doctor->nombres }} {{ $doctor->apellidos }} - {{ $doctor->especialidad }} 
                                         </option>
                                     @endforeach
                                 </select>
-                                <div class="input-group-append">
-                                    <a href="#" class="btn btn-secondary" id="limpiar-filtro2" style="display:none; margin-left: 15px;">Limpiar filtro</a>
-                                </div>
+                                <script>
+                                    $('#doctor_id2').on('change', function() {
+                                        var doctor_id2 = $(this).val();
+
+                                        var calendarEl = document.getElementById('calendar');
+                                        var calendar = new FullCalendar.Calendar(calendarEl, {
+                                            initialView: 'dayGridMonth',
+                                            locale: 'es',
+                                            events: [],
+                                        });
+
+                                        if(doctor_id2) {
+                                            if(doctor_id2 == 0) {
+                                                $.ajax({
+                                                    url: "{{ url('/cargar-citas/') }}",
+                                                    type: 'GET',
+                                                    dataType: 'json',
+                                                    success: function(data) {
+                                                        calendar.removeAllEventSources();
+                                                        calendar.addEventSource(data);
+                                                    },
+                                                    error: function(){
+                                                        alert('Error al cargar los datos')
+                                                    }
+                                                });
+                                            }else {
+                                                $.ajax({
+                                                    url: "{{ url('/cargar-citas-doctores/') }}" + '/' + doctor_id2,
+                                                    type: 'GET',
+                                                    dataType: 'json',
+                                                    success: function(data) {
+                                                        calendar.removeAllEventSources();
+                                                        calendar.addEventSource(data);
+                                                    },
+                                                    error: function(){
+                                                        alert('Error al cargar los datos')
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            calendar.removeAllEvents();
+                                        }
+                                        calendar.render();
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -225,16 +328,13 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'es'
+    @if($errors->any())
+        <script>
+            $(document).ready(function() {
+                $('#exampleModal').modal('show');
             });
-            calendar.render();
-        });
-    </script>
+        </script>
+    @endif
 @endsection
 
 @section('scripts')
@@ -274,135 +374,6 @@
             if($('#doctor_id').val()) {
                 $('#limpiar-filtro').show();
             }
-
-            // AJAX para el formulario de agendar cita
-            $('#form-agendar-cita').on('submit', function(e) {
-                e.preventDefault();
-                
-                // Limpiar errores previos
-                limpiarErrores();
-                
-                // Mostrar spinner
-                mostrarCargando(true);
-                
-                $.ajax({
-                    url: '{{ url('/admin/eventos/create') }}',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Cerrar modal inmediatamente
-                            $('#exampleModal').modal('hide');
-                            
-                            // Limpiar formulario
-                            $('#form-agendar-cita')[0].reset();
-                            
-                            // Mostrar SweetAlert con timer (igual que tu layout)
-                            Swal.fire({
-                                position: "center",
-                                icon: response.icon,
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                // Recargar página después del SweetAlert
-                                location.reload();
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422) {
-                            // Errores de validación - mantener modal abierto
-                            mostrarErroresValidacion(xhr.responseJSON.errors);
-                        } else if (xhr.status === 500) {
-                            // Error del servidor - mostrar SweetAlert de error
-                            var response = xhr.responseJSON;
-                            if (response && response.showSweetAlert) {
-                                Swal.fire({
-                                    position: "center",
-                                    icon: response.icon,
-                                    title: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                            } else {
-                                mostrarErrorGeneral('Error interno del servidor');
-                            }
-                        } else {
-                            // Otros errores
-                            mostrarErrorGeneral('Error al procesar la solicitud');
-                        }
-                    },
-                    complete: function() {
-                        // Ocultar spinner
-                        mostrarCargando(false);
-                    }
-                });
-            });
-
-            // Funciones auxiliares para el modal
-            function limpiarErrores() {
-                $('.error-message').text('');
-                $('#errores-validacion').hide();
-                $('.form-control').removeClass('is-invalid');
-            }
-
-            function mostrarCargando(mostrar) {
-                if (mostrar) {
-                    $('#btn-agendar .spinner-border').show();
-                    $('#btn-agendar').prop('disabled', true);
-                } else {
-                    $('#btn-agendar .spinner-border').hide();
-                    $('#btn-agendar').prop('disabled', false);
-                }
-            }
-
-            function mostrarErroresValidacion(errors) {
-                var errorList = '';
-                
-                $.each(errors, function(field, messages) {
-                    // Mostrar error debajo del campo específico
-                    $('[data-field="' + field + '"]').text(messages[0]);
-                    
-                    // Agregar clase de error al campo
-                    $('[name="' + field + '"]').addClass('is-invalid');
-                    
-                    // Agregar a la lista general de errores
-                    $.each(messages, function(index, message) {
-                        errorList += '<li>' + message + '</li>';
-                    });
-                });
-                
-                $('#lista-errores').html(errorList);
-                $('#errores-validacion').show();
-            }
-
-            function mostrarErrorGeneral(mensaje) {
-                $('#lista-errores').html('<li>' + mensaje + '</li>');
-                $('#errores-validacion').show();
-            }
-
-            // Limpiar errores cuando se cierre el modal
-            $('#exampleModal').on('hidden.bs.modal', function() {
-                limpiarErrores();
-                $('#form-agendar-cita')[0].reset();
-            });
-
-            // Limpiar errores cuando el usuario empiece a escribir
-            $('.form-control').on('input change', function() {
-                $(this).removeClass('is-invalid');
-                var fieldName = $(this).attr('name');
-                $('[data-field="' + fieldName + '"]').text('');
-                
-                // Si no hay más errores, ocultar el contenedor general
-                if ($('.error-message:not(:empty)').length === 0) {
-                    $('#errores-validacion').hide();
-                }
-            });
         });
     </script>
 @endsection

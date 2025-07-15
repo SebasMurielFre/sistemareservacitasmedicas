@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Doctor;
+use App\Models\Evento;
 use App\Models\Horario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WebController extends Controller
 {
@@ -25,5 +27,54 @@ class WebController extends Controller
             'horarios' => $horarios,
             'doctor_id' => $doctor_id
         ]);
+    }
+
+    public function cargarCitasDoctores($id){
+        try {
+            $eventos = Evento::where('user_id', Auth::user()->id)
+                ->where('doctor_id', $id)
+                ->get()
+                ->map(function ($evento) {
+                    // Genera un color basado en el título (para consistencia)
+                    $hash = md5($evento->title);
+                    $color = '#' . substr($hash, 0, 6);
+                    
+                    return [
+                        'title' => $evento->title,
+                        'start' => \Carbon\Carbon::parse($evento->start)->format('Y-m-d'),
+                        'end' => \Carbon\Carbon::parse($evento->end)->format('Y-m-d'),
+                        'color' => $color
+                    ];
+                });
+
+            return response()->json($eventos);
+        } catch (\Exception $exception) {
+            return response()->json(['mensaje' => 'Error'], 500);
+        }
+    }
+
+    public function cargarTodasCitas(){
+        try {
+            $eventos = Evento::where('user_id', Auth::user()->id)
+                ->get()
+                ->map(function ($evento) {
+                    // Genera un color basado en el título (para consistencia)
+                    $hash = md5($evento->doctor_id);
+                    $color = '#' . substr($hash, 0, 6);
+                    
+                    $doctor = Doctor::find($evento->doctor_id);
+
+                    return [
+                        'title' => $evento->title. ' - ' .$doctor->nombres. ' ' . $doctor->apellidos,
+                        'start' => \Carbon\Carbon::parse($evento->start)->format('Y-m-d'),
+                        'end' => \Carbon\Carbon::parse($evento->end)->format('Y-m-d'),
+                        'color' => $color
+                    ];
+                });
+
+            return response()->json($eventos);
+        } catch (\Exception $exception) {
+            return response()->json(['mensaje' => 'Error'], 500);
+        }
     }
 }

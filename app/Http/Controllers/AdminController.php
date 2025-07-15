@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Consultorio;
 use App\Models\Doctor;
+use App\Models\Evento;
 use App\Models\Horario;
 use App\Models\Paciente;
 use App\Models\Secretaria;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -29,6 +31,9 @@ class AdminController extends Controller
             })
             ->get();
 
+        
+        $eventos = Evento::where('user_id', Auth::id())->get();
+
         return view('admin.index', 
             array_merge(
                 compact(
@@ -40,7 +45,8 @@ class AdminController extends Controller
                     'total_horarios',
                     'horarios',
                     'doctores',
-                    'doctor_id'
+                    'doctor_id',
+                    'eventos'
                 )
             )
         );

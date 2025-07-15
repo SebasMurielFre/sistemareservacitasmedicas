@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\WebController::class, 'index'])->name('index');
 Route::get('/tabla-horario-doctor', [App\Http\Controllers\WebController::class, 'horarioPorDoctor'])->name('tabla_horario_doctor');
+Route::get('/cargar-citas-doctores/{id}', [App\Http\Controllers\WebController::class, 'cargarCitasDoctores'])->name('cargarCitasDoctores');
+Route::get('/cargar-citas', [App\Http\Controllers\WebController::class, 'cargarTodasCitas'])->name('cargarTodasCitas');
 Route::post('/admin/eventos/create', [App\Http\Controllers\EventoController::class, 'store'])->name('admin.eventos.create');
 
 Auth::routes();
